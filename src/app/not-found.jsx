@@ -1,13 +1,16 @@
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h2>Page Not Found</h2>
-      <p>Could not find requested resource</p>
-      <Link href="/" style={{ color: 'blue', textDecoration: 'underline' }}>
-        Return Home
+    <div className="min-h-screen flex flex-col items-center justify-center">
+      <h2 className="text-4xl font-bold mb-4">404</h2>
+      <p className="mb-6">Page Not Found</p>
+      <Link
+        href="/"
+        className="bg-blue-600 text-white px-4 py-2 rounded"
+      >
+        Go Home
       </Link>
     </div>
-  )
+  );
 }
