@@ -1,14 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import AuthService from '@/lib/auth';
+import { signIn, useSession } from 'next-auth/react';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
+  
   const redirect = searchParams.get('redirect') || '/my-bookings';
+  const error = searchParams.get('error');
   
   const [formData, setFormData] = useState({
     email: '',
@@ -17,6 +20,20 @@ export default function LoginPage() {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [oauthError, setOauthError] = useState(error);
+
+  useEffect(() => {
+    // If already logged in, redirect
+    if (session) {
+      router.push(redirect);
+    }
+  }, [session, redirect, router]);
+
+  useEffect(() => {
+    if (error) {
+      setOauthError(error);
+    }
+  }, [error]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -57,29 +74,36 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo, use demo credentials
-      if (formData.email === 'demo@care.io' && formData.password === 'demo123') {
-        // Set auth cookie
-        document.cookie = `auth-token=demo_token; path=/; max-age=${formData.rememberMe ? 7 * 24 * 60 * 60 : 24 * 60 * 60}`;
-        
-        // Redirect
-        router.push(redirect);
-      } else {
-        // Try actual login
-        const result = await AuthService.login(formData.email, formData.password);
-        
-        // Set auth cookie
-        document.cookie = `auth-token=${result.token}; path=/; max-age=${formData.rememberMe ? 7 * 24 * 60 * 60 : 24 * 60 * 60}`;
-        
-        // Redirect
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+        callbackUrl: redirect,
+      });
+
+      if (result?.error) {
+        setErrors({ submit: result.error });
+      } else if (result?.ok) {
         router.push(redirect);
       }
     } catch (error) {
-      setErrors({ submit: error.message || 'Invalid email or password' });
+      setErrors({ submit: error.message || 'Login failed' });
     } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOAuthSignIn = async (provider) => {
+    setIsLoading(true);
+    setOauthError(null);
+    
+    try {
+      await signIn(provider, {
+        callbackUrl: redirect,
+        redirect: true,
+      });
+    } catch (error) {
+      setOauthError(`Failed to sign in with ${provider}`);
       setIsLoading(false);
     }
   };
@@ -97,6 +121,25 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Sign in to your CARE-IO account</p>
         </div>
+
+        {/* Error Display */}
+        {oauthError && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-start">
+              <svg className="w-5 h-5 text-red-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p className="font-medium text-red-800">Authentication Error</p>
+                <p className="text-sm text-red-700 mt-1">
+                  {oauthError === 'AccessDenied' 
+                    ? 'Google OAuth configuration error. Please check your Google Cloud Console settings.'
+                    : 'There was an error during authentication.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Form */}
         <div className="bg-white p-8 rounded-xl shadow-lg">
@@ -160,7 +203,7 @@ export default function LoginPage() {
                 </label>
               </div>
               <Link
-                href="#"
+                href="/forgot-password"
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium"
               >
                 Forgot password?
@@ -180,7 +223,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Divider */}
+          {/* Social Login */}
           <div className="mt-8">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -194,7 +237,13 @@ export default function LoginPage() {
             <div className="mt-6 grid grid-cols-2 gap-3">
               <button
                 type="button"
-                className="w-full py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center"
+                onClick={() => handleOAuthSignIn('google')}
+                disabled={isLoading}
+                className={`w-full py-3 px-4 border rounded-lg font-medium transition-colors flex items-center justify-center ${
+                  isLoading
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -206,7 +255,13 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
-                className="w-full py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center"
+                onClick={() => handleOAuthSignIn('facebook')}
+                disabled={isLoading}
+                className={`w-full py-3 px-4 border rounded-lg font-medium transition-colors flex items-center justify-center ${
+                  isLoading
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
               >
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -232,6 +287,9 @@ export default function LoginPage() {
             Demo account: demo@care.io / demo123
           </p>
         </div>
+
+        
+        
       </div>
     </div>
   );

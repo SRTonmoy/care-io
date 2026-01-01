@@ -1,144 +1,217 @@
-import emailjs from '@emailjs/browser';
+import { Resend } from 'resend';
+import EmailTemplate from '@/components/emails/EmailTemplate';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export class EmailService {
-  // Initialize EmailJS
-  static init() {
-    if (typeof window !== 'undefined' && process.env.EMAILJS_PUBLIC_KEY) {
-      emailjs.init(process.env.EMAILJS_PUBLIC_KEY);
-    }
-  }
-
   // Send booking confirmation email
   static async sendBookingConfirmation(email, booking, service, user) {
     try {
-      const templateParams = {
-        to_email: email,
-        to_name: user.name,
-        booking_number: booking.bookingNumber,
-        service_name: service.name,
-        booking_date: new Date(booking.date).toLocaleDateString(),
-        booking_time: booking.time,
-        duration: `${booking.hours} hours`,
-        caregiver_name: booking.caregiverName || 'Assigned caregiver',
-        total_amount: `$${booking.total.toFixed(2)}`,
-        service_address: booking.address,
-        special_requests: booking.specialRequests || 'None',
-        contact_email: 'support@care.io',
-        contact_phone: '(555) 123-4567'
-      };
+      const { data, error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'CARE-IO <noreply@care.io>',
+        to: email,
+        subject: `Booking Confirmation - #${booking.bookingNumber}`,
+        react: EmailTemplate({
+          type: 'booking_confirmation',
+          data: {
+            bookingNumber: booking.bookingNumber,
+            serviceName: service.name,
+            date: booking.date,
+            time: booking.startTime,
+            hours: booking.hours,
+            address: booking.address,
+            totalAmount: booking.finalAmount,
+            userName: user.name,
+          },
+        }),
+      });
 
-      if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_TEMPLATE_ID) {
-        await emailjs.send(
-          process.env.EMAILJS_SERVICE_ID,
-          process.env.EMAILJS_TEMPLATE_ID,
-          templateParams
-        );
+      if (error) {
+        console.error('Error sending booking confirmation email:', error);
+        return { success: false, error };
       }
 
-      console.log('Booking confirmation email sent to:', email);
-      return { success: true };
+      return { success: true, data };
     } catch (error) {
       console.error('Error sending booking confirmation email:', error);
-      return { success: false, error: error.message };
+      return { success: false, error };
     }
   }
 
   // Send invoice email
   static async sendInvoice(email, invoiceData) {
     try {
-      const templateParams = {
-        to_email: email,
-        to_name: invoiceData.to.name,
-        invoice_number: invoiceData.invoiceNumber,
-        invoice_date: invoiceData.date,
-        due_date: invoiceData.dueDate,
-        items: invoiceData.items.map(item => 
-          `${item.description} - ${item.quantity} hours @ ${item.rate} = $${item.amount.toFixed(2)}`
-        ).join('\n'),
-        subtotal: `$${invoiceData.subtotal.toFixed(2)}`,
-        tax: `$${invoiceData.tax.toFixed(2)}`,
-        total: `$${invoiceData.total.toFixed(2)}`,
-        payment_instructions: invoiceData.paymentInstructions,
-        billing_address: invoiceData.to.address,
-        contact_info: `${invoiceData.from.phone} | ${invoiceData.from.email}`
-      };
+      const { data, error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'CARE-IO <noreply@care.io>',
+        to: email,
+        subject: `Invoice #${invoiceData.invoiceNumber}`,
+        react: EmailTemplate({
+          type: 'invoice',
+          data: invoiceData,
+        }),
+      });
 
-      // In a real app, you'd use a different template for invoices
-      if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_TEMPLATE_ID) {
-        await emailjs.send(
-          process.env.EMAILJS_SERVICE_ID,
-          process.env.EMAILJS_TEMPLATE_ID,
-          templateParams
-        );
+      if (error) {
+        console.error('Error sending invoice email:', error);
+        return { success: false, error };
       }
 
-      console.log('Invoice email sent to:', email);
-      return { success: true };
+      return { success: true, data };
     } catch (error) {
       console.error('Error sending invoice email:', error);
-      return { success: false, error: error.message };
+      return { success: false, error };
     }
   }
 
   // Send password reset email
   static async sendPasswordReset(email, resetLink) {
     try {
-      const templateParams = {
-        to_email: email,
-        reset_link: resetLink,
-        expiry_time: '1 hour',
-        support_email: 'support@care.io'
-      };
+      const { data, error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'CARE-IO <noreply@care.io>',
+        to: email,
+        subject: 'Reset Your CARE-IO Password',
+        react: EmailTemplate({
+          type: 'password_reset',
+          data: { resetLink },
+        }),
+      });
 
-      if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_TEMPLATE_ID) {
-        await emailjs.send(
-          process.env.EMAILJS_SERVICE_ID,
-          process.env.EMAILJS_TEMPLATE_ID,
-          templateParams
-        );
+      if (error) {
+        console.error('Error sending password reset email:', error);
+        return { success: false, error };
       }
 
-      console.log('Password reset email sent to:', email);
-      return { success: true };
+      return { success: true, data };
     } catch (error) {
       console.error('Error sending password reset email:', error);
-      return { success: false, error: error.message };
+      return { success: false, error };
     }
   }
 
   // Send welcome email
   static async sendWelcomeEmail(email, name) {
     try {
-      const templateParams = {
-        to_email: email,
-        to_name: name,
-        welcome_message: `Welcome to CARE-IO, ${name}! We're excited to help you find the perfect care for your loved ones.`,
-        dashboard_link: `${process.env.NEXT_PUBLIC_APP_URL}/my-bookings`,
-        explore_services_link: `${process.env.NEXT_PUBLIC_APP_URL}`,
-        support_email: 'support@care.io',
-        support_phone: '(555) 123-4567'
-      };
+      const { data, error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'CARE-IO <noreply@care.io>',
+        to: email,
+        subject: 'Welcome to CARE-IO!',
+        react: EmailTemplate({
+          type: 'welcome',
+          data: { name },
+        }),
+      });
 
-      if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_TEMPLATE_ID) {
-        await emailjs.send(
-          process.env.EMAILJS_SERVICE_ID,
-          process.env.EMAILJS_TEMPLATE_ID,
-          templateParams
-        );
+      if (error) {
+        console.error('Error sending welcome email:', error);
+        return { success: false, error };
       }
 
-      console.log('Welcome email sent to:', email);
-      return { success: true };
+      return { success: true, data };
     } catch (error) {
       console.error('Error sending welcome email:', error);
-      return { success: false, error: error.message };
+      return { success: false, error };
     }
   }
-}
 
-// Initialize on client side
-if (typeof window !== 'undefined') {
-  EmailService.init();
+  // Send booking reminder email
+  static async sendBookingReminder(email, booking) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'CARE-IO <noreply@care.io>',
+        to: email,
+        subject: `Reminder: Your Care Service Tomorrow`,
+        react: EmailTemplate({
+          type: 'reminder',
+          data: booking,
+        }),
+      });
+
+      if (error) {
+        console.error('Error sending reminder email:', error);
+        return { success: false, error };
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error('Error sending reminder email:', error);
+      return { success: false, error };
+    }
+  }
+
+  // Send caregiver assigned email
+  static async sendCaregiverAssigned(email, booking, caregiver) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'CARE-IO <noreply@care.io>',
+        to: email,
+        subject: `Your Caregiver Has Been Assigned - #${booking.bookingNumber}`,
+        react: EmailTemplate({
+          type: 'caregiver_assigned',
+          data: { booking, caregiver },
+        }),
+      });
+
+      if (error) {
+        console.error('Error sending caregiver assignment email:', error);
+        return { success: false, error };
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error('Error sending caregiver assignment email:', error);
+      return { success: false, error };
+    }
+  }
+
+  // Send booking cancellation email
+  static async sendBookingCancellation(email, booking, reason) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'CARE-IO <noreply@care.io>',
+        to: email,
+        subject: `Booking Cancelled - #${booking.bookingNumber}`,
+        react: EmailTemplate({
+          type: 'cancellation',
+          data: { booking, reason },
+        }),
+      });
+
+      if (error) {
+        console.error('Error sending cancellation email:', error);
+        return { success: false, error };
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error('Error sending cancellation email:', error);
+      return { success: false, error };
+    }
+  }
+
+  // Send refund confirmation email
+  static async sendRefundConfirmation(email, booking, refundAmount) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'CARE-IO <noreply@care.io>',
+        to: email,
+        subject: `Refund Processed - #${booking.bookingNumber}`,
+        react: EmailTemplate({
+          type: 'refund',
+          data: { booking, refundAmount },
+        }),
+      });
+
+      if (error) {
+        console.error('Error sending refund confirmation email:', error);
+        return { success: false, error };
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error('Error sending refund confirmation email:', error);
+      return { success: false, error };
+    }
+  }
 }
 
 export default EmailService;

@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: careio-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: careio
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    command: mongod --auth
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/careio --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  mongo-express:
+    image: mongo-express
+    container_name: careio-mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin123
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+    depends_on:
+      - mongodb
+
+  redis:
+    image: redis:7-alpine
+    container_name: careio-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: careio-app
+    ports:
+      - "3000:3000"
+    environment:
+      MONGODB_URI: mongodb://admin:admin123@mongodb:27017/careio?authSource=admin
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: your-secret-key-change-this
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run dev
+
+volumes:
+  mongodb_data:
+  redis_data:

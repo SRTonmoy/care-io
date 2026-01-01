@@ -1,0 +1,330 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String?
+  name          String
+  phone         String?
+  address       String?
+  avatar        String?
+  role          Role      @default(USER)
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  bookings      Booking[]
+  reviews       Review[]
+  notifications Notification[]
+  payments      Payment[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  CAREGIVER
+  ADMIN
+}
+
+model Caregiver {
+  id          String    @id @default(uuid())
+  userId      String    @unique
+  bio         String?
+  experience  Int       @default(0) // years
+  hourlyRate  Float
+  rating      Float     @default(0)
+  totalJobs   Int       @default(0)
+  isAvailable Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id])
+  specialties CaregiverSpecialty[]
+  bookings    Booking[]
+  reviews     Review[]
+  documents   Document[]
+  schedules   Schedule[]
+  
+  @@map("caregivers")
+}
+
+model CaregiverSpecialty {
+  id         String   @id @default(uuid())
+  caregiverId String
+  serviceId   String
+  
+  caregiver  Caregiver @relation(fields: [caregiverId], references: [id])
+  service    Service   @relation(fields: [serviceId], references: [id])
+  
+  @@unique([caregiverId, serviceId])
+  @@map("caregiver_specialties")
+}
+
+model Service {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String
+  longDescription String?
+  price       Float
+  duration    String    @default("per hour")
+  category    Category
+  image       String?
+  features    Json      // Array of strings
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  bookings    Booking[]
+  reviews     Review[]
+  specialties CaregiverSpecialty[]
+  
+  @@map("services")
+}
+
+enum Category {
+  BABY
+  ELDERLY
+  SICK
+  DISABILITY
+  POST_SURGERY
+}
+
+model Booking {
+  id              String    @id @default(uuid())
+  bookingNumber   String    @unique
+  userId          String
+  caregiverId     String?
+  serviceId       String
+  status          BookingStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  
+  // Booking details
+  date            DateTime
+  startTime       String
+  endTime         String?
+  hours           Int
+  address         String
+  specialRequests String?
+  emergencyContact String?
+  medicalConditions String?
+  
+  // Pricing
+  hourlyRate      Float
+  totalAmount     Float
+  taxAmount       Float
+  finalAmount     Float
+  
+  // Metadata
+  cancellationReason String?
+  cancellationDate DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  user        User        @relation(fields: [userId], references: [id])
+  caregiver   Caregiver?  @relation(fields: [caregiverId], references: [id])
+  service     Service     @relation(fields: [serviceId], references: [id])
+  payments    Payment[]
+  reviews     Review[]
+  activities  BookingActivity[]
+  
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+model Payment {
+  id            String    @id @default(uuid())
+  bookingId     String
+  userId        String
+  amount        Float
+  currency      String    @default("USD")
+  status        PaymentStatus @default(PENDING)
+  paymentMethod PaymentMethod
+  stripePaymentId String?  @unique
+  stripeCustomerId String?
+  receiptUrl    String?
+  
+  // Metadata
+  errorMessage  String?
+  refundAmount  Float?
+  refundReason  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  booking       Booking   @relation(fields: [bookingId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
+  
+  @@map("payments")
+}
+
+enum PaymentMethod {
+  CARD
+  BANK_TRANSFER
+  CASH
+  PAYPAL
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  bookingId  String   @unique
+  userId     String
+  caregiverId String
+  rating     Int      @range(1, 5)
+  comment    String?
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Relations
+  booking    Booking  @relation(fields: [bookingId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+  caregiver  Caregiver @relation(fields: [caregiverId], references: [id])
+  
+  @@map("reviews")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+  
+  @@map("notifications")
+}
+
+enum NotificationType {
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+  REMINDER
+  NEW_MESSAGE
+  SYSTEM
+}
+
+model BookingActivity {
+  id        String   @id @default(uuid())
+  bookingId String
+  action    String
+  details   Json?
+  actorId   String?
+  createdAt DateTime @default(now())
+  
+  // Relations
+  booking   Booking  @relation(fields: [bookingId], references: [id])
+  actor     User?    @relation(fields: [actorId], references: [id])
+  
+  @@map("booking_activities")
+}
+
+model Document {
+  id          String   @id @default(uuid())
+  caregiverId String
+  type        DocumentType
+  url         String
+  name        String
+  verified    Boolean  @default(false)
+  verifiedBy  String?
+  verifiedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  caregiver   Caregiver @relation(fields: [caregiverId], references: [id])
+  
+  @@map("documents")
+}
+
+enum DocumentType {
+  ID_CARD
+  PASSPORT
+  DRIVER_LICENSE
+  BACKGROUND_CHECK
+  CERTIFICATION
+  INSURANCE
+  RESUME
+  OTHER
+}
+
+model Schedule {
+  id          String   @id @default(uuid())
+  caregiverId String
+  dayOfWeek   Int      @range(0, 6) // 0 = Sunday
+  startTime   String
+  endTime     String
+  isAvailable Boolean  @default(true)
+  
+  // Relations
+  caregiver   Caregiver @relation(fields: [caregiverId], references: [id])
+  
+  @@unique([caregiverId, dayOfWeek])
+  @@map("schedules")
+}
+
+model Location {
+  id        String   @id @default(uuid())
+  name      String
+  address   String
+  city      String
+  state     String
+  zipCode   String
+  latitude  Float?
+  longitude Float?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  
+  @@map("locations")
+}
+
+model SystemSetting {
+  id          String  @id @default(uuid())
+  key         String  @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+  
+  @@map("system_settings")
+}
+
+// Seed data
+model ServiceSeed {
+  id    Int    @id @default(autoincrement())
+  name  String
+  data  Json
+}
