@@ -1,11 +1,11 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Providers } from "@/lib/providers";
+import Providers from "@/components/Providers";
 
 export const metadata = {
-  title: "Care.IO – Baby & Elderly Care",
-  description: "Reliable baby sitting and elderly care services",
+  title: "Care.IO",
+  description: "Trusted Baby & Elderly Care Service Platform"
 };
 
 export default function RootLayout({ children }) {

@@ -22,11 +22,13 @@
     "mongoose": "^9.1.1",
     "next": "16.1.1",
     "next-auth": "^4.24.13",
+    "nodemailer": "^7.0.12",
     "plausible-tracker": "^0.3.9",
     "posthog-js": "^1.311.0",
     "prisma": "^7.2.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-icons": "^5.5.0",
     "resend": "^2.0.0",
     "stripe": "^14.25.0",
     "twilio": "^4.19.0"

@@ -1,34 +1,50 @@
 "use client";
-import { useSession } from "next-auth/react";
 
-export default function BookingForm({ service }) {
-  const { data } = useSession();
+import { useState } from "react";
 
-  const submit = async e => {
+export default function BookingForm({ user }) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    const duration = e.target.duration.value;
-    const location = e.target.location.value;
+    setLoading(true);
 
-    await fetch("/api/bookings", {
+    const form = e.target;
+
+    const booking = {
+      userEmail: user.email,
+      service: form.service.value,
+      caregiver: form.caregiver.value,
+      date: form.date.value,
+      address: form.address.value,
+      price: 1500
+    };
+
+    const res = await fetch("/api/book", {
       method: "POST",
-      body: JSON.stringify({
-        userEmail: data.user.email,
-        serviceName: service.name,
-        duration,
-        location,
-        totalCost: duration * service.price,
-      }),
+      body: JSON.stringify(booking)
     });
 
-    alert("Booking Successful");
-  };
+    if (res.ok) {
+      alert("Booking successful! Invoice sent.");
+      form.reset();
+    } else {
+      alert("Booking failed");
+    }
+
+    setLoading(false);
+  }
 
   return (
-    <form onSubmit={submit}>
-      <input name="duration" placeholder="Duration" required />
-      <input name="location" placeholder="Location" required />
-      <p>Total Cost: dynamic</p>
-      <button>Confirm Booking</button>
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <input name="service" placeholder="Service" required />
+      <input name="caregiver" placeholder="Caregiver Name" required />
+      <input type="date" name="date" required />
+      <input name="address" placeholder="Address" required />
+
+      <button disabled={loading}>
+        {loading ? "Processing..." : "Confirm Booking"}
+      </button>
     </form>
   );
 }

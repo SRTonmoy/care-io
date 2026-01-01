@@ -1,12 +1,16 @@
 import mongoose from "mongoose";
 
-const BookingSchema = new mongoose.Schema({
-  userEmail: String,
-  serviceName: String,
-  duration: Number,
-  location: String,
-  totalCost: Number,
-  status: { type: String, default: "Pending" },
-});
+const bookingSchema = new mongoose.Schema(
+  {
+    userEmail: String,
+    service: String,
+    caregiver: String,
+    date: String,
+    address: String,
+    price: Number
+  },
+  { timestamps: true }
+);
 
-export default mongoose.models.Booking || mongoose.model("Booking", BookingSchema);
+export default mongoose.models.Booking ||
+  mongoose.model("Booking", bookingSchema);
