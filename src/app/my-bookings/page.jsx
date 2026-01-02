@@ -76,7 +76,6 @@ export default function MyBookingsPage() {
       toast.error(data.message || "Failed to cancel booking.");
     }
   } catch (err) {
-    console.error(err);
     toast.error("Something went wrong while cancelling the booking. Please try again.");
     
   }
