@@ -18,6 +18,7 @@ import {
   FaFilter,
   FaSortAmountDown
 } from "react-icons/fa";
+import toast from 'react-hot-toast';
 
 
 export default function MyBookingsPage() {
@@ -54,29 +55,32 @@ export default function MyBookingsPage() {
 };
 
   const cancelBooking = async (id) => {
-    const confirm = window.confirm("Are you sure you want to cancel this booking?");
-    if (!confirm) return;
+  const confirmCancel = window.confirm("Are you sure you want to cancel this booking?");
+  if (!confirmCancel) return;
 
-    try {
-      const res = await fetch(`/api/bookings/${id}`, {
-        method: "DELETE",
-      });
+  try {
+    const res = await fetch(`/api/bookings/${id}`, {
+      method: "DELETE",
+      credentials: "include", // ✅ crucial fix to send session cookies
+    });
 
-      if (res.ok) {
-        // Update local state
-        setBookings(prev =>
-          prev.map(b =>
-            b._id === id ? { ...b, status: "Cancelled" } : b
-          )
-        );
-      } else {
-        alert("Failed to cancel booking");
-      }
-    } catch (error) {
-      
-      alert("Error cancelling booking");
+    const data = await res.json();
+
+    if (res.ok) {
+      // Update local state
+      setBookings(prev =>
+        prev.map(b => b._id === id ? { ...b, status: "Cancelled" } : b)
+      );
+      toast.success(data.message) // You can replace alert with toast.success(data.message)
+    } else {
+      alert(data.message || "Failed to cancel booking"); // show API message
     }
-  };
+  } catch (err) {
+    console.error(err);
+    
+  }
+};
+
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {

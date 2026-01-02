@@ -7,22 +7,22 @@ export default function Footer() {
   
   const footerLinks = {
     "Our Services": [
-      { name: 'Baby Care Service', href: '/' },
-      { name: 'Elderly Care Service', href: '/' },
-      { name: 'Sick People Care', href: '/' },
-      { name: '24/7 Emergency Care', href: '/' },
+      { name: 'Baby Care Service', href: '/#' },
+      { name: 'Elderly Care Service', href: '/#' },
+      { name: 'Sick People Care', href: '/#' },
+      { name: '24/7 Emergency Care', href: '/#' },
     ],
     "Quick Links": [
-      { name: 'About Care.IO', href: '/about' },
-      { name: 'How It Works', href: '/how-it-works' },
-      { name: 'Pricing', href: '/pricing' },
-      { name: 'Caregiver Registration', href: '/caregiver-register' },
+      { name: 'About Care.IO', href: '/#' },
+      { name: 'How It Works', href: '/#' },
+      { name: 'Pricing', href: '/#' },
+      { name: 'Caregiver Registration', href: '/#' },
     ],
     "Support": [
-      { name: 'Help Center', href: '/help' },
-      { name: 'FAQ', href: '/faq' },
-      { name: 'Contact Us', href: '/contact' },
-      { name: 'Privacy Policy', href: '/privacy' },
+      { name: 'Help Center', href: '/#' },
+      { name: 'FAQ', href: '/#' },
+      { name: 'Contact Us', href: '/#' },
+      { name: 'Privacy Policy', href: '/#' },
     ],
     "Bangladesh Offices": [
       { name: 'Dhaka: 123 Care Tower, Gulshan', href: '#' },
@@ -33,10 +33,10 @@ export default function Footer() {
   };
 
   const socialLinks = [
-    { icon: <FaFacebook />, href: '#', label: 'Facebook', color: 'hover:bg-blue-600' },
-    { icon: <FaTwitter />, href: '#', label: 'Twitter', color: 'hover:bg-blue-400' },
-    { icon: <FaInstagram />, href: '#', label: 'Instagram', color: 'hover:bg-pink-600' },
-    { icon: <FaLinkedin />, href: '#', label: 'LinkedIn', color: 'hover:bg-blue-700' },
+    { icon: <FaFacebook />, href: 'https://www.facebook.com/SRTdarkhunter007', label: 'Facebook', color: 'hover:bg-blue-600' },
+    { icon: <FaTwitter />, href: 'https://x.com/srtonmoy911', label: 'Twitter', color: 'hover:bg-blue-400' },
+    { icon: <FaInstagram />, href: 'https://www.instagram.com/sr_tonmoy0769/', label: 'Instagram', color: 'hover:bg-pink-600' },
+    { icon: <FaLinkedin />, href: 'https://www.linkedin.com/in/md-shahriar-rahman-dev/', label: 'LinkedIn', color: 'hover:bg-blue-700' },
   ];
 
   return (
