@@ -284,8 +284,8 @@ export default async function ServicesPage() {
                 <button className="bg-white text-green-700 font-semibold px-6 py-3 rounded-lg hover:bg-green-50 transition">
                   Request Custom Service
                 </button>
-                <a href="tel:09612345678" className="bg-transparent border-2 border-white text-white font-semibold px-6 py-3 rounded-lg hover:bg-white hover:text-green-700 transition">
-                  Call: 09612-345678
+                <a href="tel:01752649293" className="bg-transparent border-2 border-white text-white font-semibold px-6 py-3 rounded-lg hover:bg-white hover:text-green-700 transition">
+                  Call: 01752-649293
                 </a>
               </div>
             </div>

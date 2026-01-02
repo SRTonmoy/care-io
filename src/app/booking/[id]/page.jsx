@@ -433,11 +433,11 @@ const serviceId = Array.isArray(rawId) ? rawId[0] : rawId;
                     Call us for assistance with booking:
                   </p>
                   <a 
-                    href="tel:09612345678" 
+                    href="tel:01752649293" 
                     className="flex items-center text-green-600 font-semibold hover:text-green-700"
                   >
                     <FaPhone className="mr-2" />
-                    09612-345678
+                    01752-649293
                   </a>
                 </div>
               </div>

@@ -107,7 +107,7 @@ export default function Footer() {
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Emergency Hotline</p>
-                <p className="text-white font-bold text-lg">09612-345678</p>
+                <p className="text-white font-bold text-lg">01752-649293</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">

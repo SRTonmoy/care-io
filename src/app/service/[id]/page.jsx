@@ -279,11 +279,11 @@ export default async function ServiceDetailPage({ params }) {
                       <div className="text-center py-4">
                         <p className="text-gray-600 mb-3">Contact us for pricing information</p>
                         <a 
-                          href="tel:09612345678" 
+                          href="tel:01752649293" 
                           className="inline-flex items-center text-green-600 font-semibold hover:underline"
                         >
                           <FaPhone className="mr-2" />
-                          09612-345678
+                          01752-649293
                         </a>
                       </div>
                     )}
@@ -332,8 +332,8 @@ export default async function ServiceDetailPage({ params }) {
                 <div className="mt-6 text-center">
                   <p className="text-gray-600 text-sm">
                     Need help? Call us at{" "}
-                    <a href="tel:09612345678" className="text-green-600 font-semibold hover:underline">
-                      09612-345678
+                    <a href="tel:01752649293" className="text-green-600 font-semibold hover:underline">
+                      01752-649293
                     </a>
                   </p>
                 </div>
