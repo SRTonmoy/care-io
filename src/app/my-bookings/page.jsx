@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Protected from "@/components/Protected";
@@ -18,13 +19,15 @@ import {
   FaSortAmountDown
 } from "react-icons/fa";
 
+
 export default function MyBookingsPage() {
+  
   const { data: session } = useSession();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filter, setFilter] = useState("all"); // all, pending, confirmed, completed, cancelled
-  const [sortBy, setSortBy] = useState("newest"); // newest, oldest, priceHigh, priceLow
+  const [filter, setFilter] = useState("all"); 
+  const [sortBy, setSortBy] = useState("newest"); 
 
   useEffect(() => {
     fetchBookings();

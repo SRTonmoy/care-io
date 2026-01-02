@@ -7,10 +7,10 @@ export default function Footer() {
   
   const footerLinks = {
     "Our Services": [
-      { name: 'Baby Care Service', href: '/services/baby-care' },
-      { name: 'Elderly Care Service', href: '/services/elderly-care' },
-      { name: 'Sick People Care', href: '/services/sick-care' },
-      { name: '24/7 Emergency Care', href: '/services/emergency' },
+      { name: 'Baby Care Service', href: '/' },
+      { name: 'Elderly Care Service', href: '/' },
+      { name: 'Sick People Care', href: '/' },
+      { name: '24/7 Emergency Care', href: '/' },
     ],
     "Quick Links": [
       { name: 'About Care.IO', href: '/about' },

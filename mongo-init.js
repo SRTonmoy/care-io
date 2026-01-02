@@ -28,4 +28,3 @@ db.payments.createIndex({ stripePaymentId: 1 }, { sparse: true });
 db.reviews.createIndex({ bookingId: 1 }, { unique: true });
 db.reviews.createIndex({ caregiverId: 1 });
 
-console.log('✅ MongoDB initialized successfully');
