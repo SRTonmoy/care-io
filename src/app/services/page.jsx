@@ -47,12 +47,12 @@ export default async function ServicesPage() {
             
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search services (baby care, elderly, nursing, etc.)"
-                  className="w-full px-6 py-4 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 pr-12"
-                />
+              <div className="relative w-full max-w-2xl mx-auto">
+  <input
+    type="text"
+    placeholder="Search services (baby care, elderly, nursing, etc.)"
+    className="w-full px-6 py-4 pr-14 rounded-2xl text-gray-900 shadow-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+  />
                 <button className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition">
                   <FaSearch />
                 </button>
