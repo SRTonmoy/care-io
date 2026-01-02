@@ -42,7 +42,7 @@ const user = await User.findOne({ email: session.user.email }).select("-password
       }
     });
   } catch (error) {
-    console.error("Profile fetch error:", error);
+   
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
@@ -110,7 +110,7 @@ export async function PUT(request) {
       }
     });
   } catch (error) {
-    console.error("Profile update error:", error);
+    
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

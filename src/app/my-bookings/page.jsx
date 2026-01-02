@@ -47,7 +47,7 @@ export default function MyBookingsPage() {
     setBookings(data);
   } catch (err) {
     setError("Failed to load bookings. Please try again.");
-    console.error(err);
+  
   } finally {
     setLoading(false);
   }
@@ -73,7 +73,7 @@ export default function MyBookingsPage() {
         alert("Failed to cancel booking");
       }
     } catch (error) {
-      console.error("Cancel error:", error);
+      
       alert("Error cancelling booking");
     }
   };

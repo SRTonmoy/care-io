@@ -67,7 +67,7 @@ const serviceId = Array.isArray(rawId) ? rawId[0] : rawId;
       const data = await res.json();
       setService(data);
     } catch (error) {
-      console.error("Error fetching service:", error);
+      
     } finally {
       setLoading(false);
     }
@@ -139,7 +139,7 @@ const serviceId = Array.isArray(rawId) ? rawId[0] : rawId;
         alert("Booking failed. Please try again.");
       }
     } catch (error) {
-      console.error("Booking error:", error);
+      
       alert("Error creating booking.");
     }
   };
@@ -157,7 +157,7 @@ const serviceId = Array.isArray(rawId) ? rawId[0] : rawId;
         })
       });
     } catch (error) {
-      console.error("Email error:", error);
+     
     }
   };
 

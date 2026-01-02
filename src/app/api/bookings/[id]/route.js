@@ -41,7 +41,7 @@ export async function DELETE(request, { params }) {
 
     return NextResponse.json({ message: "Booking cancelled successfully" });
   } catch (error) {
-    console.error("Booking cancellation error:", error);
+    
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

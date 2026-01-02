@@ -8,7 +8,7 @@ export async function GET() {
     const services = await Service.find({}).sort({ createdAt: -1 });
     return NextResponse.json(services);
   } catch (error) {
-    console.error("Services fetch error:", error);
+    
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
@@ -23,7 +23,7 @@ export async function POST(request) {
     const service = await Service.create(body);
     return NextResponse.json(service, { status: 201 });
   } catch (error) {
-    console.error("Service creation error:", error);
+   
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

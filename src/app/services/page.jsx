@@ -14,7 +14,7 @@ async function getServices() {
     const services = await Service.find({}).sort({ createdAt: -1 });
     return JSON.parse(JSON.stringify(services));
   } catch (error) {
-    console.error("Error fetching services:", error);
+   
     return [];
   }
 }

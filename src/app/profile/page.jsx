@@ -103,7 +103,7 @@ export default function ProfilePage() {
         contact: user.contact || "",
       });
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      
     } finally {
       setLoading(false);
     }

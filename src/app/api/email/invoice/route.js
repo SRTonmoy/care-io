@@ -60,7 +60,7 @@ export async function POST(request) {
 
     return NextResponse.json({ message: "Invoice email sent successfully" });
   } catch (error) {
-    console.error("Email error:", error);
+   
     return NextResponse.json(
       { message: "Failed to send email" },
       { status: 500 }

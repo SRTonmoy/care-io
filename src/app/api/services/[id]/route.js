@@ -33,7 +33,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json(serviceData);
   } catch (error) {
-    console.error("Service fetch error:", error);
+   
     return NextResponse.json(
       { error: "Internal server error" }, 
       { status: 500 }

@@ -86,7 +86,7 @@ export default function HeroSlider() {
         await new Promise(resolve => setTimeout(resolve, 500));
         setImages(careImages);
       } catch (error) {
-        console.error("Error loading images:", error);
+       
       } finally {
         setIsLoading(false);
       }

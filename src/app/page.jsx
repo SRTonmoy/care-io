@@ -20,7 +20,7 @@ async function getServices() {
     
     return await res.json();
   } catch (error) {
-    console.error('Error fetching services:', error);
+    
     return [];
   }
 }

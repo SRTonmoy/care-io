@@ -69,7 +69,7 @@ export async function PUT(request) {
       message: "Password updated successfully"
     });
   } catch (error) {
-    console.error("Password update error:", error);
+   
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
